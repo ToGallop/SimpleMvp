@@ -6,19 +6,19 @@ import io.reactivex.observers.DisposableSingleObserver;
  * Created by DELL on 2018年8月30日 030.
  * E-Mail:n.zjx@163.com
  * SimpleMvp
- * HttpResultSubscriber:
+ * HttpResultSubscriber: 数据回调处理
  */
 public abstract class HttpResultObserver<T> extends DisposableSingleObserver<T> {
 
-
     @Override
     public void onSuccess(T t) {
+        dispose();
         onResult(t);
     }
 
-
     @Override
     public void onError(Throwable e) {
+        dispose();
         onFailure(e);
     }
 

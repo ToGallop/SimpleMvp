@@ -37,8 +37,12 @@ public abstract class BasePresenter<V extends IBaseView> {
 
     /**
      * @param disposable 添加Disposable到CompositeDisposable
+     *                   通过解除disposable处理内存泄漏问题
      */
     protected boolean addDisposable(Disposable disposable) {
+        if (isNullOrDisposed(disposable)) {
+            return false;
+        }
         return mDisposables.add(disposable);
     }
 

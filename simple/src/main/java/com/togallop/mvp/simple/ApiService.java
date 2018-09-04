@@ -15,4 +15,7 @@ public interface ApiService {
     @GET("users/{username}")
     Single<String> getUser(@Path("username") String userName);
 
+    @GET("orgs/{org}")
+    Single<String> getOrg(@Path("org") String org);
+
 }

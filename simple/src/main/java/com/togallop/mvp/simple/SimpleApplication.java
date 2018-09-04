@@ -17,6 +17,8 @@ public class SimpleApplication extends Application {
         super.onCreate();
         HttpManager.getInstance()
                 .setBaseUrl("https://api.github.com/")
-                .setDebug(BuildConfig.DEBUG);
+                .setDebug(BuildConfig.DEBUG)
+                .setOkHttpClient(HttpManager.getInstance().createDefaultClient())
+                .setRetrofit(HttpManager.getInstance().createRetrofit());
     }
 }

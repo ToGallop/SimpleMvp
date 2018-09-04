@@ -19,6 +19,11 @@ public interface IBaseView {
     void showLoading();
 
     /**
+     * 带文字信息显示loading
+     */
+    void showLoading(String msg);
+
+    /**
      * 隐藏loading
      */
     void hideLoading();

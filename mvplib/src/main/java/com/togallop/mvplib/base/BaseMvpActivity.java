@@ -1,6 +1,5 @@
 package com.togallop.mvplib.base;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,15 +16,13 @@ public abstract class BaseMvpActivity<P extends BasePresenter<? extends IBaseVie
     //主Presenter
     protected P mPresenter;
     //多个Presenter时候需要的容器
-    private ArraySet<? extends BasePresenter> mPresenters = new ArraySet<>(4);
-    //Loading Dialog
-    private Dialog mLoading;
+    private ArraySet<BasePresenter> mPresenters = new ArraySet<>(4);
 
     @Override
     protected void init(@Nullable Bundle savedInstanceState) {
+        initLoading();
         mPresenter = getPresenter();
-        mLoading = initLoading();
-        mPresenter.attachView(this);
+        addToPresenters(mPresenter);
         initView();
         initListener();
         initData();
@@ -33,7 +30,6 @@ public abstract class BaseMvpActivity<P extends BasePresenter<? extends IBaseVie
 
     @Override
     protected void onDestroy() {
-        mPresenter.detachView();
         for (BasePresenter presenter : mPresenters) {
             presenter.detachView();
         }
@@ -43,16 +39,17 @@ public abstract class BaseMvpActivity<P extends BasePresenter<? extends IBaseVie
 
     @Override
     public void showLoading() {
-        if (mLoading != null && !mLoading.isShowing()) {
-            mLoading.show();
-        }
+
+    }
+
+    @Override
+    public void showLoading(String msg) {
+
     }
 
     @Override
     public void hideLoading() {
-        if (mLoading != null && mLoading.isShowing()) {
-            mLoading.dismiss();
-        }
+
     }
 
     @Override
@@ -60,19 +57,25 @@ public abstract class BaseMvpActivity<P extends BasePresenter<? extends IBaseVie
         toastS(msg);
     }
 
+    /**
+     * 初始化Presenter，其他多个Presenter也在该方法创建并调用addToPresenters加入到集合
+     * @return 主Presenter
+     */
     protected abstract P getPresenter();
 
     /**
-     * @return loading Dialog
+     * 根据具体项目需求创建loading
      */
-    protected Dialog initLoading() {
-        return new ProgressDialog(this);
+    protected void initLoading() {
+
     }
 
     /**
      * 初始化View
      */
-    protected abstract void initView();
+    protected void initView(){
+
+    }
 
     /**
      * 初始化Listener
@@ -84,5 +87,13 @@ public abstract class BaseMvpActivity<P extends BasePresenter<? extends IBaseVie
      */
     protected abstract void initData();
 
+    /**
+     * 把其他的Presenter添加到Presenters集合里
+     * 这样会自动绑定View和管理内存释放
+     */
+    protected <T extends BasePresenter> void addToPresenters(T presenter) {
+        presenter.attachView(this);
+        mPresenters.add(presenter);
+    }
 
 }

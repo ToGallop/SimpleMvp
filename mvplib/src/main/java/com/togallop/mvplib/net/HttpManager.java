@@ -24,49 +24,70 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public final class HttpManager {
 
     private Retrofit mRetrofit;
-    // TODO: 2018年8月30日 030 URL要改
-    private String mBaseUrl = "https://api.github.com/";
+    private String mBaseUrl;
     private OkHttpClient mOkHttpClient;
     private Boolean debug = true;
 
-    private final Logger LOG = Logger.getLogger(HttpManager.class.getName());
+    private static final Logger LOG = Logger.getLogger(HttpManager.class.getName());
 
     private HttpManager() {
-        mRetrofit = createRetrofit();
     }
 
     public static HttpManager getInstance() {
         return Holder.INSTANCE;
     }
 
-    public HttpManager setOkHttpClient(OkHttpClient okHttpClient) {
-        this.mOkHttpClient = okHttpClient;
-        return Holder.INSTANCE;
-    }
-
+    /**
+     * @param mBaseUrl 设置BaseUrl
+     *                 放在第一位设置
+     */
     public HttpManager setBaseUrl(String mBaseUrl) {
         this.mBaseUrl = mBaseUrl;
         return Holder.INSTANCE;
     }
 
+    /**
+     * 设置OkHttpClient
+     */
+    public HttpManager setOkHttpClient(OkHttpClient okHttpClient) {
+        this.mOkHttpClient = okHttpClient;
+        return Holder.INSTANCE;
+    }
+
+    /**
+     * @param retrofit 设置retrofit
+     *                 放在最后设置
+     */
+    public void setRetrofit(Retrofit retrofit) {
+        this.mRetrofit = retrofit;
+    }
+
+    /**
+     * debug
+     */
     public HttpManager setDebug(Boolean debug) {
         this.debug = debug;
         return Holder.INSTANCE;
     }
 
+    /**
+     * @return mRetrofit.create(clazz)
+     */
     public <T> T getApiService(Class<T> clazz) {
         return mRetrofit.create(clazz);
     }
 
-    private Retrofit createRetrofit() {
-        mOkHttpClient = createDefaultClient();
+    /**
+     * 自带创建retrofit
+     */
+    public Retrofit createRetrofit() {
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(mBaseUrl)
                 .client(mOkHttpClient)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-                .addCallAdapterFactory(ObserveOnMainCallAdapterFactory.createMainScheduler());
+                .addCallAdapterFactory(ObserveOnMainCallAdapterFactory.createMainScheduler())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()));
         return builder.build();
     }
 
@@ -96,7 +117,7 @@ public final class HttpManager {
     /**
      * info 等级log
      */
-    private class InterceptorLogInfo implements HttpLoggingInterceptor.Logger {
+    public static class InterceptorLogInfo implements HttpLoggingInterceptor.Logger {
         @Override
         public void log(@NonNull String message) {
             LOG.log(Level.INFO, message);
